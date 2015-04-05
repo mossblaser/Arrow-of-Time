@@ -1,6 +1,8 @@
 """Py.test suite for Arrow-of-Time."""
 
-from arrow_of_time import A, B, Particle, Universe
+import pytest
+
+from arrow_of_time import A, B, C, Particle, Universe
 
 
 def dump_state(u):
@@ -56,24 +58,18 @@ def test_collide_aa():
 	
 	# Check collision occurs correctly
 	u.step()
-	assert len(u.particles) == 3
+	assert len(u.particles) == 2
 	assert u.particles[0].type == B
 	assert u.particles[0].x == 1
 	assert u.particles[0].y == 0
 	assert u.particles[0].vx == 1
 	assert u.particles[0].vy == 0
 	
-	assert u.particles[1].type == B
+	assert u.particles[1].type == C
 	assert u.particles[1].x == 1
 	assert u.particles[1].y == 0
 	assert u.particles[1].vx == -1
 	assert u.particles[1].vy == 0
-	
-	assert u.particles[2].type == B
-	assert u.particles[2].x == 1
-	assert u.particles[2].y == 0
-	assert u.particles[2].vx == 1
-	assert u.particles[2].vy == 0
 	
 	u.step(-1)
 	assert before == dump_state(u)
@@ -89,30 +85,24 @@ def test_collide_aaa():
 	
 	# Check collision occurs correctly and that third particle remains an A
 	u.step()
-	assert len(u.particles) == 4
+	assert len(u.particles) == 3
 	assert u.particles[0].type == B
 	assert u.particles[0].x == 1
 	assert u.particles[0].y == 0
 	assert u.particles[0].vx == 1
 	assert u.particles[0].vy == 0
 	
-	assert u.particles[1].type == B
+	assert u.particles[1].type == C
 	assert u.particles[1].x == 1
 	assert u.particles[1].y == 0
 	assert u.particles[1].vx == -1
 	assert u.particles[1].vy == 0
 	
-	assert u.particles[2].type == B
+	assert u.particles[2].type == A
 	assert u.particles[2].x == 1
 	assert u.particles[2].y == 0
-	assert u.particles[2].vx == 1
-	assert u.particles[2].vy == 0
-	
-	assert u.particles[3].type == A
-	assert u.particles[3].x == 1
-	assert u.particles[3].y == 0
-	assert u.particles[3].vx == 0
-	assert u.particles[3].vy == -1
+	assert u.particles[2].vx == 0
+	assert u.particles[2].vy == -1
 	
 	u.step(-1)
 	assert before == dump_state(u)
@@ -129,14 +119,14 @@ def test_collide_aaaa():
 	
 	# Check collision occurs correctly and that third particle remains an A
 	u.step()
-	assert len(u.particles) == 6
+	assert len(u.particles) == 4
 	assert u.particles[0].type == B
 	assert u.particles[0].x == 1
 	assert u.particles[0].y == 0
 	assert u.particles[0].vx == 1
 	assert u.particles[0].vy == 0
 	
-	assert u.particles[1].type == B
+	assert u.particles[1].type == C
 	assert u.particles[1].x == 1
 	assert u.particles[1].y == 0
 	assert u.particles[1].vx == -1
@@ -145,36 +135,24 @@ def test_collide_aaaa():
 	assert u.particles[2].type == B
 	assert u.particles[2].x == 1
 	assert u.particles[2].y == 0
-	assert u.particles[2].vx == 1
-	assert u.particles[2].vy == 0
+	assert u.particles[2].vx == 0
+	assert u.particles[2].vy == -1
 	
-	assert u.particles[3].type == B
+	assert u.particles[3].type == C
 	assert u.particles[3].x == 1
 	assert u.particles[3].y == 0
 	assert u.particles[3].vx == 0
-	assert u.particles[3].vy == -1
-	
-	assert u.particles[4].type == B
-	assert u.particles[4].x == 1
-	assert u.particles[4].y == 0
-	assert u.particles[4].vx == 0
-	assert u.particles[4].vy == 1
-	
-	assert u.particles[5].type == B
-	assert u.particles[5].x == 1
-	assert u.particles[5].y == 0
-	assert u.particles[5].vx == 0
-	assert u.particles[5].vy == 1
+	assert u.particles[3].vy == 1
 	
 	u.step(-1)
 	assert before == dump_state(u)
 
 
-def test_collide_bbb():
+@pytest.mark.parametrize("p1,p2", [(B, C), (C, B)])
+def test_collide_bc(p1, p2):
 	u = Universe(10, 10)
-	u.particles.append(Particle(B, 0, 1, 1, -1))
-	u.particles.append(Particle(B, 2, 9, -1, 1))
-	u.particles.append(Particle(B, 2, 1, -1, -1))
+	u.particles.append(Particle(p1, 0, 0, 1, 0))
+	u.particles.append(Particle(p2, 2, 0, -1, 0))
 	
 	before = dump_state(u)
 	
@@ -184,14 +162,14 @@ def test_collide_bbb():
 	assert u.particles[0].type == A
 	assert u.particles[0].x == 1
 	assert u.particles[0].y == 0
-	assert u.particles[0].vx == -1
-	assert u.particles[0].vy == 1
+	assert u.particles[0].vx == 1
+	assert u.particles[0].vy == 0
 	
 	assert u.particles[1].type == A
 	assert u.particles[1].x == 1
 	assert u.particles[1].y == 0
 	assert u.particles[1].vx == -1
-	assert u.particles[1].vy == -1
+	assert u.particles[1].vy == 0
 	
 	print(before)
 	print(dump_state(u))

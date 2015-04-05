@@ -10,6 +10,7 @@ import random
 # Particle types
 A = "A"
 B = "B"
+C = "C"
 
 
 class Particle(object):
@@ -25,14 +26,11 @@ class Particle(object):
 class Universe(object):
 	"""A model of the universe where there are two fundamental particle types.
 	
-	Particles of type A aniahlate upon collision producing three particles of type
-	B. The first two type B particles will have the same velocities as the type A
-	particles and the third will have the X-velocity of the first A and the
-	Y-velocity of the second A.
+	Particles of type A aniahlate upon collision producing two particles of type B
+	and C which have the same velocities of the two A particles.
 	
-	If three type B particles collide, two type A particles are produced where the
-	first two type B particles effectively become type A particles and the third
-	is deleted.
+	If a B and C particle collide, two type A particles are produced, taking the
+	same velocities again.
 	"""
 	
 	def __init__(self, width, height):
@@ -68,7 +66,7 @@ class Universe(object):
 		
 		# Determine action to take as a result of collisions
 		for _, collider in sorted([(0 * step, self._collide_aa),
-		                           (1 * step, self._collide_bbb)]):
+		                           (1 * step, self._collide_bc)]):
 			collider(grid, step)
 	
 	
@@ -77,39 +75,30 @@ class Universe(object):
 		for (x, y), ps in grid.items():
 			a_particles = [p for p in ps if p.type == A]
 			
-			if step > 0:
-				a_iter = iter(a_particles)
-			else:
-				a_iter = iter(reversed(a_particles))
+			a_iter = iter(a_particles)
 			for a1, a2 in zip(a_iter, a_iter):
 				ps.remove(a1)
 				ps.remove(a2)
 				
 				a1.type = B
-				a2.type = B
-				b3 = Particle(type=B, x=a1.x, y=a2.y, vx=a1.vx, vy=a2.vy)
-				self.particles.insert(self.particles.index(a2) + 1, b3)
+				a2.type = C
 	
 	
-	def _collide_bbb(self, grid, step):
+	def _collide_bc(self, grid, step):
 		"""Check for and apply collision effects of three B particles colliding."""
 		for (x, y), ps in grid.items():
 			b_particles = [p for p in ps if p.type == B]
+			c_particles = [p for p in ps if p.type == C]
 			
-			if step > 0:
-				b_iter = iter(reversed(b_particles))
-			else:
-				b_iter = iter(b_particles)
+			b_iter = iter(reversed(b_particles))
+			c_iter = iter(reversed(c_particles))
 			
-			for b1, b2, b3 in zip(b_iter, b_iter, b_iter):
-				ps.remove(b1)
-				ps.remove(b2)
-				ps.remove(b3)
+			for b, c in zip(b_iter, c_iter):
+				ps.remove(b)
+				ps.remove(c)
 				
-				b1.type = A
-				b2.type = A
-				# The third particle is just removed
-				self.particles.remove(b3)
+				b.type = A
+				c.type = A
 	
 	def __str__(self):
 		return ", ".join("{}({}, {})".format(p.type, p.x, p.y) for p in u.particles)
@@ -129,25 +118,23 @@ def make_random_universe(width, height, n_particles, types):
 	return u
 
 
-
-
 if __name__=="__main__":
 	w, h = 100, 100
-	#n_particles = 100
-	#u = make_random_universe(w, h, n_particles, [A])
+	n_particles = 100
+	n_steps = 1000
 	
-	u = Universe(w, h)
-	u.particles.append(Particle(A, 0, 0, 1, 0))
-	u.particles.append(Particle(A, 6, 0, -1, 0))
-	u.particles.append(Particle(A, 3, 3, 0, -1))
+	u = make_random_universe(w, h, n_particles, [A])
 	
-	n_steps = 10
-	print(sum(1 for p in u.particles if p.type == B))
+	# Run time forward
+	print("{} non-A particles at t=0".format(
+		sum(1 for p in u.particles if p.type != A)))
 	for _ in range(n_steps):
 		u.step()
-		print(str(u))
-	print(sum(1 for p in u.particles if p.type == B))
+	print("{} non-A particles at t={}".format(
+		sum(1 for p in u.particles if p.type != A), n_steps-1))
+	
+	# Run time backward again
 	for _ in range(n_steps):
 		u.step(-1)
-		print(str(u))
-	print(sum(1 for p in u.particles if p.type == B))
+	print("{} non-A particles at t=0".format(
+		sum(1 for p in u.particles if p.type != A)))
