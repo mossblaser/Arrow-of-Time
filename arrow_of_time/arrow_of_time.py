@@ -77,7 +77,11 @@ class Universe(object):
 		for (x, y), ps in grid.items():
 			a_particles = [p for p in ps if p.type == A]
 			
-			a_iter = iter(a_particles)
+			if step > 0:
+				a_iter = iter(a_particles)
+			else:
+				a_iter = iter(reversed(a_particles))
+			
 			for a1, a2 in zip(a_iter, a_iter):
 				ps.remove(a1)
 				ps.remove(a2)
@@ -87,7 +91,13 @@ class Universe(object):
 				b3 = Particle(B, a1.x, a1.y, a1.aux, a2.aux, None)
 				a1.aux = None
 				a2.aux = None
-				self.particles.insert(self.particles.index(a2) + 1, b3)
+				
+				if step > 0:
+					# After last
+					self.particles.insert(self.particles.index(a2) + 1, b3)
+				else:
+					# Before first (note order is reversed so a2 is first)
+					self.particles.insert(self.particles.index(a2), b3)
 	
 	
 	def _collide_bbb(self, grid, step):
@@ -95,7 +105,10 @@ class Universe(object):
 		for (x, y), ps in grid.items():
 			b_particles = [p for p in ps if p.type == B]
 			
-			b_iter = iter(reversed(b_particles))
+			if step > 0:
+				b_iter = iter(b_particles)
+			else:
+				b_iter = iter(reversed(b_particles))
 			
 			for b3, b2, b1 in zip(b_iter, b_iter, b_iter):
 				ps.remove(b1)
@@ -132,9 +145,18 @@ def make_random_universe(width, height, n_particles, types):
 
 
 if __name__=="__main__":
-	w, h = 100, 100
-	n_particles = 400
-	n_steps = 1000
+	# XXX
+	def dump_state(u):
+		return [(p.type, p.x, p.y, p.vx, p.vy, p.aux) for p in u.particles]
+	
+	random.seed(0)
+	
+	w, h = 2, 1
+	n_particles = 4
+	n_steps = 100
+	
+	dumps_fwd = []
+	dumps_bwd = []
 	
 	u = make_random_universe(w, h, n_particles, [A])
 	
@@ -142,12 +164,23 @@ if __name__=="__main__":
 	print("{} non-A particles at t=0".format(
 		sum(1 for p in u.particles if p.type != A)))
 	for _ in range(n_steps):
+		dumps_fwd.append(dump_state(u))
 		u.step()
+	dumps_fwd.append(dump_state(u))
 	print("{} non-A particles at t={}".format(
 		sum(1 for p in u.particles if p.type != A), n_steps-1))
 	
 	# Run time backward again
 	for _ in range(n_steps):
+		dumps_bwd.append(dump_state(u))
 		u.step(-1)
+	dumps_bwd.append(dump_state(u))
 	print("{} non-A particles at t=0".format(
 		sum(1 for p in u.particles if p.type != A)))
+	
+	
+	for n, (fwd, bwd) in enumerate(zip(reversed(dumps_fwd), dumps_bwd)):
+		print("{}\n  fwd={}\n  bwd={}".format(n_steps - n - 1, fwd, bwd))
+		if fwd != bwd:
+			print("Different!")
+			break

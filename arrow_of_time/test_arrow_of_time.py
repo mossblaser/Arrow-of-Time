@@ -200,27 +200,31 @@ def test_collide_bbb():
 	assert u.particles[0].type == A
 	assert u.particles[0].x == 1
 	assert u.particles[0].y == 0
-	assert u.particles[0].vx == 1
+	assert u.particles[0].vx == -1
 	assert u.particles[0].vy == 0
-	assert u.particles[0].aux == -2
+	assert u.particles[0].aux == 0
 	
 	assert u.particles[1].type == A
 	assert u.particles[1].x == 1
 	assert u.particles[1].y == 0
-	assert u.particles[1].vx == -1
-	assert u.particles[1].vy == 0
-	assert u.particles[1].aux == -1
+	assert u.particles[1].vx == -2
+	assert u.particles[1].vy == -1
+	assert u.particles[1].aux == 1
 	
+	print(before)
+	print(dump_state(u))
 	u.step(-1)
+	print(dump_state(u))
+	
 	assert before == dump_state(u)
 
 
 def test_xxx():
 	u = Universe(2, 1)
+	u.particles.append(Particle(B, 1, 0, 0, 0, None))
+	u.particles.append(Particle(B, 1, 0, 0, 0, None))
 	u.particles.append(Particle(A, 0, 0, 1, 0, 0))
 	u.particles.append(Particle(A, 0, 0, 0, 0, 0))
-	u.particles.append(Particle(B, 1, 0, 0, 0, None))
-	u.particles.append(Particle(B, 1, 0, 0, 0, None))
 	u.particles.append(Particle(B, 1, 0, 0, 0, None))
 	
 	before = dump_state(u)
