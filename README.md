@@ -8,3 +8,20 @@ non-A particles) increases no matter which direction time advances except
 following a small number of starting states.
 
 Currently not working!
+
+
+Development
+-----------
+
+To setup in a virtualenv:
+
+    $ virtualenv arrow_of_time_env
+    $ cd arrow_of_time_env
+    $ . bin/activate
+    $ git clone git@github.com:mossblaser/Arrow-of-Time.git arrow_of_time
+    $ cd arrow_of_time
+
+To run tests:
+
+    $ pip install -r requirements-test.txt
+    $ py.test arrow_of_time
