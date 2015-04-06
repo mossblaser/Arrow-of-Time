@@ -2,6 +2,8 @@
 
 import pytest
 
+from itertools import permutations
+
 from arrow_of_time import A, B, Particle, Universe
 
 
@@ -219,13 +221,17 @@ def test_collide_bbb():
 	assert before == dump_state(u)
 
 
-def test_xxx():
+@pytest.mark.parametrize("particles",
+	permutations([Particle(A, 0, 0, 1, 0, 0),
+	              Particle(A, 0, 0, 0, 0, 0),
+	              Particle(B, 1, 0, 0, 0, None),
+	              Particle(B, 1, 0, 0, 0, None),
+	              Particle(B, 1, 0, 0, 0, None)]))
+def test_ambiguous_order(particles):
+	# In this test, the input's order must be recovered when stepping back in
+	# time.
 	u = Universe(2, 1)
-	u.particles.append(Particle(B, 1, 0, 0, 0, None))
-	u.particles.append(Particle(B, 1, 0, 0, 0, None))
-	u.particles.append(Particle(A, 0, 0, 1, 0, 0))
-	u.particles.append(Particle(A, 0, 0, 0, 0, 0))
-	u.particles.append(Particle(B, 1, 0, 0, 0, None))
+	u.particles.extend(particles)
 	
 	before = dump_state(u)
 	
