@@ -136,7 +136,7 @@ def test_collide_aaaa():
 	
 	before = dump_state(u)
 	
-	# Check collision occurs correctly and that third particle remains an A
+	# Check two collisions occur correctly
 	u.step()
 	assert len(u.particles) == 6
 	assert u.particles[0].type == B
@@ -186,7 +186,7 @@ def test_collide_aaaa():
 	assert before == dump_state(u)
 
 
-def test_collide_bc():
+def test_collide_bbb():
 	u = Universe(10, 10)
 	u.particles.append(Particle(B, 0, 0, 1, 0))
 	u.particles.append(Particle(B, 2, 0, -1, 0))
