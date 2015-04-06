@@ -213,4 +213,22 @@ def test_collide_bc():
 	
 	u.step(-1)
 	assert before == dump_state(u)
+
+
+def test_xxx():
+	u = Universe(2, 1)
+	u.particles.append(Particle(A, 0, 0, 1, 0, 0))
+	u.particles.append(Particle(A, 0, 0, 0, 0, 0))
+	u.particles.append(Particle(B, 1, 0, 0, 0, None))
+	u.particles.append(Particle(B, 1, 0, 0, 0, None))
+	u.particles.append(Particle(B, 1, 0, 0, 0, None))
 	
+	before = dump_state(u)
+	
+	print(dump_state(u))
+	u.step()
+	print(dump_state(u))
+	u.step(-1)
+	print(dump_state(u))
+	
+	assert before == dump_state(u)
