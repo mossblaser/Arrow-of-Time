@@ -2,7 +2,7 @@
 
 import pytest
 
-from arrow_of_time import A, B, C, Particle, Universe
+from arrow_of_time import A, B, Particle, Universe
 
 
 def dump_state(u):
@@ -73,7 +73,7 @@ def test_collide_aa():
 	assert u.particles[1].vy == 0
 	assert u.particles[1].aux == None
 	
-	assert u.particles[2].type == C
+	assert u.particles[2].type == B
 	assert u.particles[2].x == 1
 	assert u.particles[2].y == 0
 	assert u.particles[2].vx == 2
@@ -109,7 +109,7 @@ def test_collide_aaa():
 	assert u.particles[1].vy == 0
 	assert u.particles[1].aux == None
 	
-	assert u.particles[2].type == C
+	assert u.particles[2].type == B
 	assert u.particles[2].x == 1
 	assert u.particles[2].y == 0
 	assert u.particles[2].vx == 2
@@ -153,7 +153,7 @@ def test_collide_aaaa():
 	assert u.particles[1].vy == 0
 	assert u.particles[1].aux == None
 	
-	assert u.particles[2].type == C
+	assert u.particles[2].type == B
 	assert u.particles[2].x == 1
 	assert u.particles[2].y == 0
 	assert u.particles[2].vx == 2
@@ -174,7 +174,7 @@ def test_collide_aaaa():
 	assert u.particles[4].vy == 1
 	assert u.particles[4].aux == None
 	
-	assert u.particles[5].type == C
+	assert u.particles[5].type == B
 	assert u.particles[5].x == 1
 	assert u.particles[5].y == 0
 	assert u.particles[5].vx == 4
@@ -190,7 +190,7 @@ def test_collide_bc():
 	u = Universe(10, 10)
 	u.particles.append(Particle(B, 0, 0, 1, 0))
 	u.particles.append(Particle(B, 2, 0, -1, 0))
-	u.particles.append(Particle(C, 3, 1, -2, -1))
+	u.particles.append(Particle(B, 3, 1, -2, -1))
 	
 	before = dump_state(u)
 	
